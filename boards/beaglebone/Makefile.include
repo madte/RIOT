@@ -1,6 +1,6 @@
 
 # define the cpu used by the arduino due board
-export CPU = sam3x8e
+export CPU = xam3359
 
 # define tools used for building the project
 export PREFIX = arm-none-eabi-
@@ -13,24 +13,32 @@ export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
 
 #define the flash-tool and default port depending on the host operating system
-OS = $(shell uname)
-ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyACM0
-  FLASHER = stty -F $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255; $(RIOTBOARD)/$(BOARD)/dist/bossac
-else ifeq ($(OS),Darwin)
-  PORT ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
-  FLASHER = stty -f $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255; $(RIOTBOARD)/$(BOARD)/dist/bossac_osx
-else
-  $(info CAUTION: No flash tool for your host system found!)
-  # TODO: fix for building under windows
-endif
-export FLASHER
-export PORT
+#OS = $(shell uname)
+#ifeq ($(OS),Linux)
+#  PORT ?= /dev/ttyACM0
+#  FLASHER = stty -F $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255; $(RIOTBOARD)/$(BOARD)/dist/bossac
+#else ifeq ($(OS),Darwin)
+#  PORT ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+#  FLASHER = stty -f $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255; $(RIOTBOARD)/$(BOARD)/dist/bossac_osx
+#else
+#  $(info CAUTION: No flash tool for your host system found!)
+#  # TODO: fix for building under windows
+#endif
+#export FLASHER
+#export PORT
 
 # define build specific options
-export CPU_USAGE = -mcpu=cortex-m3
-export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CPU_USAGE = -mcpu=cortex-a8
+export CFLAGS += -mtune=cortex-a8 -march=armv7-a -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
 export CFLAGS += -DREENTRANT_SYSCALLS_PROVIDED
+
+#CFLAGS Starterware:
+#CFLAGS=-mcpu=cortex-a8 -mtune=cortex-a8 -march=armv7-a
+#CFLAGS+=-c ${${TARGET_MODE}_FLAG} -mlong-calls -fdata-sections -funsigned-char \
+#            -ffunction-sections -Wall ${IPATH} -Dgcc ${DEVICE_D} ${EVM_D} \
+#            -D SUPPORT_UNALIGNED -D ${BOOT} -D${CONSOLE}
+
+
 export ASFLAGS += -ggdb -g3 -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian
 export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
 # linkerscript specified in cpu/Makefile.include
