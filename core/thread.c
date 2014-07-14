@@ -37,12 +37,6 @@ inline int thread_getpid(void)
     return sched_active_thread->pid;
 }
 
-int thread_getlastpid(void)
-{
-    extern int thread_last_pid;
-    return thread_last_pid;
-}
-
 int thread_getstatus(int pid)
 {
     if (sched_threads[pid] == NULL) {
@@ -86,7 +80,7 @@ int thread_wakeup(int pid)
         sched_set_status(other_thread, STATUS_RUNNING);
 
         restoreIRQ(old_state);
-        sched_switch(sched_active_thread->priority, other_thread->priority);
+        sched_switch(other_thread->priority);
 
         return 1;
     }
@@ -112,7 +106,7 @@ int thread_measure_stack_free(char *stack)
     return space_free;
 }
 
-int thread_create(char *stack, int stacksize, char priority, int flags, void (*function)(void), const char *name)
+int thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
 {
     /* allocate our thread control block at the top of our stackspace */
     int total_stacksize = stacksize;
@@ -178,7 +172,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
         return -EOVERFLOW;
     }
 
-    cb->sp = thread_stack_init(function, stack, stacksize);
+    cb->sp = thread_stack_init(function, arg, stack, stacksize);
     cb->stack_start = stack;
     cb->stack_size = total_stacksize;
 

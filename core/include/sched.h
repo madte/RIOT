@@ -55,13 +55,12 @@ void sched_set_status(tcb_t *process, unsigned int status);
 
 /**
  * @brief   Compare thread priorities and yield() (or set
- *          sched_context_switch_request if in_isr) when other_prio is higher
- *          (has a lower value) than current_prio
+ *          sched_context_switch_request if inISR()) when other_prio is higher
+ *          (has a lower value) than the current thread's priority
  *
- * @param[in]   current_prio    The priority of the current thread
  * @param[in]   other_prio      The priority of the target thread
  */
-void sched_switch(uint16_t current_prio, uint16_t other_prio);
+void sched_switch(uint16_t other_prio);
 
 /**
  * @brief   Call context switching at thread exit
@@ -95,11 +94,6 @@ extern volatile int sched_num_threads;
 extern volatile int sched_active_pid;
 
 /**
- *  Process ID of the thread that was active before the current one
- */
-extern volatile int last_pid;
-
-/**
  * List of runqueues per priority level
  */
 extern clist_node_t *runqueues[SCHED_PRIO_LEVELS];
@@ -118,7 +112,7 @@ typedef struct {
 /**
  *  Thread statistics table
  */
-extern schedstat pidlist[MAXTHREADS];
+extern schedstat sched_pidlist[MAXTHREADS];
 
 /**
  *  @brief  Register a callback that will be called on every scheduler run

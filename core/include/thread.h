@@ -67,6 +67,7 @@
  * @param[in] priority  priority of the new thread, lower mean higher priority
  * @param[in] flags     optional flags for the creation of the new thread
  * @param[in] function  pointer to the code that is executed in the new thread
+ * @param[in] arg       the argument to the function
  * @param[in] name      a human readable descriptor for the thread
  *
  * @return              value ``<0`` on error
@@ -76,9 +77,9 @@ int thread_create(char *stack,
                   int stacksize,
                   char priority,
                   int flags,
-                  void (*function) (void),
+                  void *(*function)(void *arg),
+                  void *arg,
                   const char *name);
-
 /**
  * @brief Returns the status of a process
  *
@@ -129,13 +130,6 @@ int thread_wakeup(int pid);
  * @return          obviously you are not a golfer.
  */
 int thread_getpid(void);
-
-/**
- * @brief Returns the process ID of the thread running before the current one
- *
- * @return          obviously you are not a golfer.
- */
-int thread_getlastpid(void);
 
 /**
  * @brief Measures the stack usage of a stack
